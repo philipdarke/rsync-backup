@@ -8,14 +8,26 @@
 
 import sys
 import os
+import argparse
+
+# Parse arguments --------------------------------------------------------------
+
+parser = argparse.ArgumentParser(prog="rsync_backup",
+                                 description="Parses files/folders for use by rsync")
+parser.add_argument("-i", "--include", help="Path to include.rsync file",
+                    type=str, default="include.rsync", dest="INCLUDE_FILE")
+parser.add_argument("-e", "--exclude", help="Path to exclude.rsync file",
+                    type=str, default="exclude.rsync", dest="EXCLUDE_FILE")
+parser.add_argument("-o", "--output", help="Path for output file", type=str,
+                    default="backup.rsync", dest="OUTPUT_FILE")
+parser.add_argument("-v", "--verbose", help="Show more console output",
+                    action="store_true", dest="LOG")
+parser.add_argument("--version", action="version", version="%(prog)s b2.0")
+args = parser.parse_args()
 
 # Input and output files -------------------------------------------------------
 
-INCLUDE_FILE = "include.rsync"
-EXCLUDE_FILE = "exclude.rsync"
-OUTPUT_FILE = "backup.rsync"
 HOME = ["/home/", "/home/philipdarke/", "/home/philipdarke/*"]
-LOG = False
 
 # Functions --------------------------------------------------------------------
 
@@ -23,7 +35,7 @@ LOG = False
 # Prints raw string to file and also to console if LOG is True
 def logger(raw_text):
     output.write(raw_text)
-    if LOG == True:
+    if args.LOG == True:
         sys.stdout.write(raw_text)
         sys.stdout.flush()
 
@@ -85,8 +97,8 @@ global_exclude = []
 
 # Process input files
 print("Processing input files...")
-paths_inc = process_file(INCLUDE_FILE)
-paths_exc = process_file(EXCLUDE_FILE)
+paths_inc = process_file(args.INCLUDE_FILE)
+paths_exc = process_file(args.EXCLUDE_FILE)
 
 # Get directories (sub and parent) to include in backup
 print("Finding all paths to include...")
@@ -108,8 +120,8 @@ for exclude in global_exclude:
     paths_final = [path for path in paths_final if exclude not in path]
 
 # Remove any duplicate directories, sort and print results to file
-print("Writing results to", OUTPUT_FILE)
-with open(OUTPUT_FILE, "w") as output:
+print("Writing results to", args.OUTPUT_FILE)
+with open(args.OUTPUT_FILE, "w") as output:
     for path in sorted(set(paths_final)):
         logger("+ " + path + "\n")
     logger("- *\n")
