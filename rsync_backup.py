@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Parse Windows files/folders for use by rsync
+# Parse files/folders for use by rsync
 # Philip Darke (January 2019)
 # philipdarke.com
 
@@ -27,7 +27,7 @@ args = parser.parse_args()
 
 # Input and output files -------------------------------------------------------
 
-HOME = ["/home/", "/home/philipdarke/", "/home/philipdarke/*"]
+#HOME = ["/home/", "/home/philipdarke/", "/home/philipdarke/*"]
 
 # Functions --------------------------------------------------------------------
 
@@ -42,8 +42,8 @@ def logger(raw_text):
 # convert_path()
 # Convert Windows path to Unix path
 def convert_path(path):
-    # Remove colon, convert \ to / and remove trailing whitespaces
-    unix_path = path.replace(":", "", 1).replace("\\", "/").rstrip()
+    # Remove colon and convert back-slashes to forward-slashes
+    unix_path = path.replace(":", "", 1).replace("\\", "/")
     # Add mnt/ and convert drive letter to lower case
     unix_path = "/mnt/" + unix_path[0].lower() + unix_path[1:]
     return(unix_path)
@@ -60,6 +60,7 @@ def get_subdirs(path):
             fwd_slash = "/" if dir[-1:] != "/" else ""
             subdirs.append(dir + fwd_slash)
             subdirs.append(dir + fwd_slash + "*")
+    print(subdirs)
     return(subdirs)
 
 # get_parentdirs()
@@ -80,18 +81,22 @@ def process_file(file):
     paths = []
     with open(file) as input_file:
         for line in input_file:
+            # Remove trailing whitespaces
+            line = line.rstrip()
+            # Skip line if is blank or commented out
+            if line[:1] == "" or line[:1] == "#": continue
             # Add directory to global_exclude list if line is not a path
-            if line[:1] == "\\":
-                global_exclude.append(line.replace("\\", "/").rstrip())
-            # Otherwise add to list of paths (check if commented out or blank)
-            elif line[:1] != "#" and line[:1] != "":
-                paths.append(convert_path(line))
+            if line[:1] == "\\": global_exclude.append(line.replace("\\", "/"))
+            # Add to list of paths if is a Linux path
+            elif line[:1] == "/": paths.append(line)
+            # Otherwise convert to Linux path and add
+            else: paths.append(convert_path(line))
     return(paths)
 
 # Main -------------------------------------------------------------------------
 
 # Variables to hold path lists
-included_paths = HOME
+included_paths = []
 excluded_paths = []
 global_exclude = []
 
