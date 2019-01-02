@@ -25,7 +25,7 @@ parser.add_argument("-e", "--exclude", help="Path to exclude.rsync file",
 parser.add_argument("-o", "--output", help="Path for include-from file",
                     type=str, default="backup.rsync", dest="OUTPUT_FILE")
 parser.add_argument("-k", "--keep", help="Retain include-from file",
-                    action="store_true", dest="keep_output")
+                    action="store_false", dest="delete_output")
 parser.add_argument("-q", "--quiet", help="Show less console output",
                     action="store_false", dest="LOG")
 parser.add_argument("--version", action="version", version="%(prog)s b3.0")
@@ -37,7 +37,7 @@ args = parser.parse_args()
 # Prints raw string to file and also to console if LOG is True
 def logger(raw_text):
     output.write(raw_text)
-    if args.LOG == True:
+    if args.LOG:
         sys.stdout.write(raw_text)
         sys.stdout.flush()
 
@@ -135,7 +135,7 @@ with open(args.OUTPUT_FILE, "w") as output:
 # Form arguments for rsync
 rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
               " / ", args.path]
-if args.LOG == True:
+if args.LOG:
     rsync_call[2:2] = "v"
     rsync_call.extend(" --progress")
 rsync_call = "".join(rsync_call)
@@ -143,4 +143,4 @@ rsync_call = "".join(rsync_call)
 # Run rsync and delete temporary file
 print(rsync_call)
 subprocess.run(rsync_call, shell=True)
-if args.keep_output == False: os.remove(args.OUTPUT_FILE)
+if args.delete_output: os.remove(args.OUTPUT_FILE)
