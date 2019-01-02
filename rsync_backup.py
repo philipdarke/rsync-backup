@@ -54,14 +54,15 @@ def convert_path(path):
 # Generates a list of all subdirectories for a path (includes the path/file)
 def get_subdirs(path):
     subdirs = []
-    if path[-1:] != "/":
-        subdirs.append(path)  # If path points to a file, add path to list
-    else:
-        # Otherwise walk down the tree and append subdirectory names to list
+    if path.endswith("/"):
+        # Walk down the tree and append subdirectory names to list
         for dir, subdir, file in os.walk(path):
             fwd_slash = "/" if dir[-1:] != "/" else ""
             subdirs.append(dir + fwd_slash)
             subdirs.append(dir + fwd_slash + "*")
+    else:
+        # If path points to a file, add path to list
+        subdirs.append(path)
     return(subdirs)
 
 # get_parentdirs()
@@ -85,16 +86,15 @@ def process_file(file):
             # Remove trailing whitespaces
             line = line.rstrip()
             # Skip line if is blank or commented out
-            if line[:1] == "" or line[:1] == "#": continue
+            if len(line) == 0 or line.startswith("#"): continue
             # Add directory to global_exclude list if line is not a path
-            if line[:1] == ":":
+            if line.startswith(":"):
                 temp_exclude = line[1:].replace("\\", "/")
-                if temp_exclude[:1] != "/": temp_exclude = "/" + temp_exclude
-                if temp_exclude[-1:] != "/": temp_exclude = temp_exclude + "/"
-                print(temp_exclude)
+                if not temp_exclude.startswith("/"): temp_exclude = "/" + temp_exclude
+                if not temp_exclude.endswith("/"): temp_exclude += "/"
                 global_exclude.append(temp_exclude)
             # Add to list of paths if is a Linux path
-            elif line[:1] == "/": paths.append(line)
+            elif line.startswith("/"): paths.append(line)
             # Otherwise convert to Linux path and add
             else: paths.append(convert_path(line))
     return(paths)
