@@ -87,7 +87,12 @@ def process_file(file):
             # Skip line if is blank or commented out
             if line[:1] == "" or line[:1] == "#": continue
             # Add directory to global_exclude list if line is not a path
-            if line[:1] == "\\": global_exclude.append(line.replace("\\", "/"))
+            if line[:1] == ":":
+                temp_exclude = line[1:].replace("\\", "/")
+                if temp_exclude[:1] != "/": temp_exclude = "/" + temp_exclude
+                if temp_exclude[-1:] != "/": temp_exclude = temp_exclude + "/"
+                print(temp_exclude)
+                global_exclude.append(temp_exclude)
             # Add to list of paths if is a Linux path
             elif line[:1] == "/": paths.append(line)
             # Otherwise convert to Linux path and add
@@ -126,7 +131,7 @@ for exclude in global_exclude:
     paths_final = [path for path in paths_final if exclude not in path]
 
 # Remove any duplicate directories, sort and print results to file
-print("Writing results to", args.OUTPUT_FILE)
+print("Writing path list to", args.OUTPUT_FILE)
 with open(args.OUTPUT_FILE, "w") as output:
     for path in sorted(set(paths_final)):
         logger("+ " + path + "\n")
@@ -137,7 +142,7 @@ rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
               " / ", args.path]
 if args.LOG:
     rsync_call[2:2] = "v"
-    rsync_call.extend(" --progress")
+    rsync_call.append(" --progress")
 rsync_call = "".join(rsync_call)
 
 # Run rsync and delete temporary file
