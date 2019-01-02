@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Parse files/folders for use by rsync
+# Backup selected files/folders using rsync
 # Philip Darke (January 2019)
 # philipdarke.com
 
@@ -9,25 +9,27 @@
 import sys
 import os
 import argparse
+import subprocess
 
 # Parse arguments --------------------------------------------------------------
 
 parser = argparse.ArgumentParser(prog="rsync_backup",
                                  description="Parses files/folders for use by rsync")
+parser.add_argument("path", help="Path for backup")
+parser.add_argument("-a", "--args", help="Arguments for rsync", type=str,
+                    dest="rsync_args")
 parser.add_argument("-i", "--include", help="Path to include.rsync file",
                     type=str, default="include.rsync", dest="INCLUDE_FILE")
 parser.add_argument("-e", "--exclude", help="Path to exclude.rsync file",
                     type=str, default="exclude.rsync", dest="EXCLUDE_FILE")
-parser.add_argument("-o", "--output", help="Path for output file", type=str,
-                    default="backup.rsync", dest="OUTPUT_FILE")
-parser.add_argument("-v", "--verbose", help="Show more console output",
-                    action="store_true", dest="LOG")
-parser.add_argument("--version", action="version", version="%(prog)s b2.0")
+parser.add_argument("-o", "--output", help="Path for include-from file",
+                    type=str, default="backup.rsync", dest="OUTPUT_FILE")
+parser.add_argument("-k", "--keep", help="Retain include-from file",
+                    action="store_true", dest="keep_output")
+parser.add_argument("-q", "--quiet", help="Show less console output",
+                    action="store_false", dest="LOG")
+parser.add_argument("--version", action="version", version="%(prog)s b3.0")
 args = parser.parse_args()
-
-# Input and output files -------------------------------------------------------
-
-#HOME = ["/home/", "/home/philipdarke/", "/home/philipdarke/*"]
 
 # Functions --------------------------------------------------------------------
 
@@ -60,7 +62,6 @@ def get_subdirs(path):
             fwd_slash = "/" if dir[-1:] != "/" else ""
             subdirs.append(dir + fwd_slash)
             subdirs.append(dir + fwd_slash + "*")
-    print(subdirs)
     return(subdirs)
 
 # get_parentdirs()
@@ -130,3 +131,16 @@ with open(args.OUTPUT_FILE, "w") as output:
     for path in sorted(set(paths_final)):
         logger("+ " + path + "\n")
     logger("- *\n")
+
+# Form arguments for rsync
+rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
+              " / ", args.path]
+if args.LOG == True:
+    rsync_call[2:2] = "v"
+    rsync_call.extend(" --progress")
+rsync_call = "".join(rsync_call)
+
+# Run rsync and delete temporary file
+print(rsync_call)
+subprocess.run(rsync_call, shell=True)
+if args.keep_output == False: os.remove(args.OUTPUT_FILE)
