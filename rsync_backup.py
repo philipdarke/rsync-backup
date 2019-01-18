@@ -16,8 +16,8 @@ import subprocess
 parser = argparse.ArgumentParser(prog="rsync_backup",
                                  description="Parses files/folders for use by rsync")
 parser.add_argument("path", help="Path for backup")
-parser.add_argument("-a", "--args", help="Arguments for rsync", type=str,
-                    dest="rsync_args")
+parser.add_argument("-a", "--args", help="Arguments for rsync (default rR)", type=str,
+                    default="rR", dest="rsync_args")
 parser.add_argument("-i", "--include", help="Path to include.rsync file",
                     type=str, default="include.rsync", dest="INCLUDE_FILE")
 parser.add_argument("-e", "--exclude", help="Path to exclude.rsync file",
