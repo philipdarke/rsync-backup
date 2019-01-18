@@ -10,6 +10,7 @@ import sys
 import os
 import argparse
 import subprocess
+import time
 
 # Parse arguments --------------------------------------------------------------
 
@@ -138,8 +139,9 @@ with open(args.OUTPUT_FILE, "w") as output:
     logger("- *\n")
 
 # Form arguments for rsync
+backup_path = args.path + time.strftime("%d.%m.%Y") + "/"
 rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
-              " / ", args.path]
+              " / ", backup_path]
 if args.LOG:
     rsync_call[2:2] = "v"
     rsync_call.append(" --progress")
