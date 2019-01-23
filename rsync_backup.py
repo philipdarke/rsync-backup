@@ -111,22 +111,20 @@ def process_file(file):
 
 # Main -------------------------------------------------------------------------
 
-# Variables to hold path lists
-included_paths = []
-excluded_paths = []
-
 # Process input file
 print("Processing input file...")
 paths = process_file(args.INPUT_FILE)
 
 # Get directories (sub and parent) to include in backup
 print("Finding all paths to include...")
+included_paths = []
 for inc_path in paths[0]:
     included_paths.extend(get_subdirs(inc_path))
     included_paths.extend(get_parentdirs(inc_path))
 
 # Get subdirectories to exclude in backup
 print("Finding all paths to exclude...")
+excluded_paths = []
 for exc_path in paths[1]:
     excluded_paths.extend(get_subdirs(exc_path))
 
@@ -134,7 +132,7 @@ for exc_path in paths[1]:
 print("Generating list of paths to backup...")
 paths_final = [path for path in included_paths if path not in excluded_paths]
 
-# Remove directories in global_exclude
+# Remove paths containing directories in the "partial exclude" list
 for exc_path in paths[2]:
     paths_final = [path for path in paths_final if exc_path not in path]
 
@@ -145,10 +143,11 @@ with open(args.OUTPUT_FILE, "w") as output:
         logger("+ " + path + "\n", output, args.LOG)
     logger("- *\n", output, args.LOG)
 
+# Set path for backup
+if args.path.endswith("/"): backup_path = args.path
+else: backup_path = args.path + "/" + time.strftime("%d.%m.%Y") + "/"
+
 # Form arguments for rsync
-if not args.path.endswith("/"):
-    backup_path = args.path + "/" + time.strftime("%d.%m.%Y") + "/"
-else: backup_path = args.path
 rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
               " / ", backup_path]
 if args.LOG:
@@ -158,7 +157,7 @@ if args.backup:
     rsync_call[2:2] = "n"
 rsync_call = "".join(rsync_call)
 
-# Run rsync and delete temporary file
+# Run rsync and delete temporary file if delete_output is True
 print(rsync_call)
 subprocess.run(rsync_call, shell=True)
 if args.delete_output: os.remove(args.OUTPUT_FILE)
