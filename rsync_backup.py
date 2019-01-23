@@ -37,10 +37,10 @@ args = parser.parse_args()
 # Functions --------------------------------------------------------------------
 
 # logger()
-# Prints raw string to file and also to console if LOG is True
-def logger(raw_text):
+# Prints raw string to file and also to console if log is True
+def logger(raw_text, output, log):
     output.write(raw_text)
-    if args.LOG:
+    if log:
         sys.stdout.write(raw_text)
         sys.stdout.flush()
 
@@ -137,8 +137,8 @@ for exclude in global_exclude:
 print("Writing path list to", args.OUTPUT_FILE)
 with open(args.OUTPUT_FILE, "w") as output:
     for path in sorted(set(paths_final)):
-        logger("+ " + path + "\n")
-    logger("- *\n")
+        logger("+ " + path + "\n", output, args.LOG)
+    logger("- *\n", output, args.LOG)
 
 # Form arguments for rsync
 if not args.path.endswith("/"):
