@@ -43,13 +43,16 @@ def logger(raw_text, output, log):
         sys.stdout.flush()
 
 # convert_path()
-# Convert Windows path to Unix path
+# Convert Windows path to Linux path
 def convert_path(path):
-    # Remove colon and convert back-slashes to forward-slashes
-    unix_path = path.replace(":", "", 1).replace("\\", "/")
-    # Add mnt/ and convert drive letter to lower case
-    unix_path = "/mnt/" + unix_path[0].lower() + unix_path[1:]
-    return(unix_path)
+    # Assume path is Linux if starts with a forward-slash
+    if path.startswith("/"): return(path)
+    else:
+        # Remove colon and convert back-slashes to forward-slashes
+        linux_path = path.replace(":", "", 1).replace("\\", "/")
+        # Add initial "mnt/" and convert drive letter to lower case
+        linux_path = "/mnt/" + linux_path[0].lower() + linux_path[1:]
+    return(linux_path)
 
 # get_subdirs()
 # Generates a list of all subdirectories for a path (includes the path/file)
@@ -100,12 +103,10 @@ def process_file(file):
                 partial_exclude.append(temp_exclude)
             # Add directory to include list if line starts with "+"
             elif line.startswith("+"):
-                if line.startswith("/"): include.append(line[1:])
-                else: include.append(convert_path(line[1:]))
+                include.append(convert_path(line[1:]))
             # Add directory to exclude list if line starts with "-"
             elif line.startswith("-"):
-                if line.startswith("/"): exclude.append(line[1:])
-                else: exclude.append(convert_path(line[1:]))
+                exclude.append(convert_path(line[1:]))
     return(include, exclude, partial_exclude)
 
 # Main -------------------------------------------------------------------------
