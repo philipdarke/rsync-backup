@@ -141,7 +141,9 @@ with open(args.OUTPUT_FILE, "w") as output:
     logger("- *\n")
 
 # Form arguments for rsync
-backup_path = args.path + time.strftime("%d.%m.%Y") + "/"
+if not args.path.endswith("/"):
+    backup_path = args.path + "/" + time.strftime("%d.%m.%Y") + "/"
+else: backup_path = args.path
 rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
               " / ", backup_path]
 if args.LOG:
