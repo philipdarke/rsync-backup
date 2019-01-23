@@ -18,15 +18,15 @@ parser = argparse.ArgumentParser(prog="rsync_backup",
                                  description="Backup selected files/folders using rsync")
 parser.add_argument("path", help="Path for backup")
 parser.add_argument("-b", "--backup", help="Make backup (else does a dry run)",
-                    action="store_false", dest="backup")
+                    action="store_false", dest="BACKUP")
 parser.add_argument("-a", "--args", help="Arguments for rsync (default ar)", type=str,
-                    default="ar", dest="rsync_args")
+                    default="ar", dest="RSYNC_ARGS")
 parser.add_argument("-i", "--input", help="Path to input.rsync file",
                     type=str, default="input.rsync", dest="INPUT_FILE")
 parser.add_argument("-o", "--output", help="Path for include-from file",
                     type=str, default="backup.rsync", dest="OUTPUT_FILE")
 parser.add_argument("-k", "--keep", help="Retain include-from file",
-                    action="store_false", dest="delete_output")
+                    action="store_false", dest="DELETE_OUTPUT")
 parser.add_argument("-q", "--quiet", help="Show less console output",
                     action="store_false", dest="LOG")
 parser.add_argument("--version", action="version", version="%(prog)s b4.0")
@@ -157,16 +157,16 @@ else:
     backup_path = test_path
 
 # Form arguments for rsync
-rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
+rsync_call = ["rsync -", args.RSYNC_ARGS," --include-from=", args.OUTPUT_FILE,
               " / ", backup_path]
 if args.LOG:
     rsync_call[2:2] = "v"
     rsync_call.append(" --progress")
-if args.backup:
+if args.BACKUP:
     rsync_call[2:2] = "n"
 rsync_call = "".join(rsync_call)
 
-# Run rsync and delete temporary file if delete_output is True
+# Run rsync and delete temporary file if DELETE_OUTPUT is True
 print(rsync_call)
 subprocess.run(rsync_call, shell=True)
-if args.delete_output: os.remove(args.OUTPUT_FILE)
+if args.DELETE_OUTPUT: os.remove(args.OUTPUT_FILE)
