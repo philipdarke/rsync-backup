@@ -17,6 +17,8 @@ import time
 parser = argparse.ArgumentParser(prog="rsync_backup",
                                  description="Parses files/folders for use by rsync")
 parser.add_argument("path", help="Path for backup")
+parser.add_argument("-b", "--backup", help="Make backup (else does a dry run)",
+                    action="store_false", dest="backup")
 parser.add_argument("-a", "--args", help="Arguments for rsync (default rR)", type=str,
                     default="rR", dest="rsync_args")
 parser.add_argument("-i", "--include", help="Path to include.rsync file",
@@ -145,6 +147,8 @@ rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
 if args.LOG:
     rsync_call[2:2] = "v"
     rsync_call.append(" --progress")
+if args.backup:
+    rsync_call[2:2] = "n"
 rsync_call = "".join(rsync_call)
 
 # Run rsync and delete temporary file
