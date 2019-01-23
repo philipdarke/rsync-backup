@@ -21,17 +21,15 @@ parser.add_argument("-b", "--backup", help="Make backup (else does a dry run)",
                     action="store_false", dest="backup")
 parser.add_argument("-a", "--args", help="Arguments for rsync (default ar)", type=str,
                     default="ar", dest="rsync_args")
-parser.add_argument("-i", "--include", help="Path to include.rsync file",
-                    type=str, default="include.rsync", dest="INCLUDE_FILE")
-parser.add_argument("-e", "--exclude", help="Path to exclude.rsync file",
-                    type=str, default="exclude.rsync", dest="EXCLUDE_FILE")
+parser.add_argument("-i", "--include", help="Path to input.rsync file",
+                    type=str, default="input.rsync", dest="INPUT_FILE")
 parser.add_argument("-o", "--output", help="Path for include-from file",
                     type=str, default="backup.rsync", dest="OUTPUT_FILE")
 parser.add_argument("-k", "--keep", help="Retain include-from file",
                     action="store_false", dest="delete_output")
 parser.add_argument("-q", "--quiet", help="Show less console output",
                     action="store_false", dest="LOG")
-parser.add_argument("--version", action="version", version="%(prog)s b3.0")
+parser.add_argument("--version", action="version", version="%(prog)s b4.0")
 args = parser.parse_args()
 
 # Functions --------------------------------------------------------------------
@@ -81,57 +79,63 @@ def get_parentdirs(path):
     return(parentdirs)
 
 # process_file()
-# Read each path of input file into a list of Linux format paths
+# Process each path in input file to form lists of Linux format paths
 def process_file(file):
-    paths = []
+    # Variables to hold path lists
+    include = []
+    exclude = []
+    partial_exclude = []
+    # Populate path lists
     with open(file) as input_file:
         for line in input_file:
+            # Skip line if it is blank or commented out
+            if len(line) == 0 or line.startswith("#"): continue
             # Remove trailing whitespaces
             line = line.rstrip()
-            # Skip line if is blank or commented out
-            if len(line) == 0 or line.startswith("#"): continue
-            # Add directory to global_exclude list if line is not a path
+            # Add directory to partial_exclude list if line starts with ":"
             if line.startswith(":"):
                 temp_exclude = line[1:].replace("\\", "/")
                 if not temp_exclude.startswith("/"): temp_exclude = "/" + temp_exclude
                 if not temp_exclude.endswith("/"): temp_exclude += "/"
-                global_exclude.append(temp_exclude)
-            # Add to list of paths if is a Linux path
-            elif line.startswith("/"): paths.append(line)
-            # Otherwise convert to Linux path and add
-            else: paths.append(convert_path(line))
-    return(paths)
+                partial_exclude.append(temp_exclude)
+            # Add directory to include list if line starts with "+"
+            elif line.startswith("+"):
+                if line.startswith("/"): include.append(line[1:])
+                else: include.append(convert_path(line[1:]))
+            # Add directory to exclude list if line starts with "-"
+            elif line.startswith("-"):
+                if line.startswith("/"): exclude.append(line[1:])
+                else: exclude.append(convert_path(line[1:]))
+    return(include, exclude, partial_exclude)
 
 # Main -------------------------------------------------------------------------
 
 # Variables to hold path lists
 included_paths = []
 excluded_paths = []
-global_exclude = []
 
-# Process input files
-print("Processing input files...")
-paths_inc = process_file(args.INCLUDE_FILE)
-paths_exc = process_file(args.EXCLUDE_FILE)
+# Process input file
+print("Processing input file...")
+paths = process_file(args.INPUT_FILE)
 
 # Get directories (sub and parent) to include in backup
 print("Finding all paths to include...")
-for path in paths_inc:
-    included_paths.extend(get_subdirs(path))
-    included_paths.extend(get_parentdirs(path))
+for inc_path in paths[0]:
+    included_paths.extend(get_subdirs(inc_path))
+    included_paths.extend(get_parentdirs(inc_path))
 
 # Get subdirectories to exclude in backup
 print("Finding all paths to exclude...")
-for path in paths_exc:
-    excluded_paths.extend(get_subdirs(path))
+for exc_path in paths[1]:
+    excluded_paths.extend(get_subdirs(exc_path))
 
 # Remove excluded subdirectories
 print("Generating list of paths to backup...")
 paths_final = [path for path in included_paths if path not in excluded_paths]
 
 # Remove directories in global_exclude
-for exclude in global_exclude:
-    paths_final = [path for path in paths_final if exclude not in path]
+for exc_path in paths[2]:
+    paths_final = [path for path in paths_final if exc_path not in path]
 
 # Remove any duplicate directories, sort and print results to file
 print("Writing path list to", args.OUTPUT_FILE)
