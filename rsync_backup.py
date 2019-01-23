@@ -15,13 +15,13 @@ import time
 # Parse arguments --------------------------------------------------------------
 
 parser = argparse.ArgumentParser(prog="rsync_backup",
-                                 description="Parses files/folders for use by rsync")
+                                 description="Backup selected files/folders using rsync")
 parser.add_argument("path", help="Path for backup")
 parser.add_argument("-b", "--backup", help="Make backup (else does a dry run)",
                     action="store_false", dest="backup")
 parser.add_argument("-a", "--args", help="Arguments for rsync (default ar)", type=str,
                     default="ar", dest="rsync_args")
-parser.add_argument("-i", "--include", help="Path to input.rsync file",
+parser.add_argument("-i", "--input", help="Path to input.rsync file",
                     type=str, default="input.rsync", dest="INPUT_FILE")
 parser.add_argument("-o", "--output", help="Path for include-from file",
                     type=str, default="backup.rsync", dest="OUTPUT_FILE")
