@@ -12,25 +12,88 @@ import argparse
 import subprocess
 import time
 
-# Parse arguments --------------------------------------------------------------
+# Main -------------------------------------------------------------------------
 
-parser = argparse.ArgumentParser(prog="rsync_backup",
-                                 description="Backup selected files/folders using rsync")
-parser.add_argument("path", help="Path for backup")
-parser.add_argument("-b", "--backup", help="Make backup (else does a dry run)",
-                    action="store_false", dest="BACKUP")
-parser.add_argument("-a", "--args", help="Arguments for rsync (default ar)", type=str,
-                    default="ar", dest="RSYNC_ARGS")
-parser.add_argument("-i", "--input", help="Path to input.rsync file",
-                    type=str, default="input.rsync", dest="INPUT_FILE")
-parser.add_argument("-o", "--output", help="Path for include-from file",
-                    type=str, default="backup.rsync", dest="OUTPUT_FILE")
-parser.add_argument("-k", "--keep", help="Retain include-from file",
-                    action="store_false", dest="DELETE_OUTPUT")
-parser.add_argument("-q", "--quiet", help="Show less console output",
-                    action="store_false", dest="LOG")
-parser.add_argument("--version", action="version", version="%(prog)s b4.0")
-args = parser.parse_args()
+def main(argv):
+
+    # Parse arguments
+    parser = argparse.ArgumentParser(prog="rsync_backup",
+                                     description="Backup selected files/folders using rsync")
+    parser.add_argument("path", help="Path for backup")
+    parser.add_argument("-b", "--backup", help="Make backup (else does a dry run)",
+                        action="store_false", dest="BACKUP")
+    parser.add_argument("-a", "--args", help="Arguments for rsync (default ar)",
+                        type=str, default="ar", dest="RSYNC_ARGS")
+    parser.add_argument("-i", "--input", help="Path to input.rsync file",
+                        type=str, default="input.rsync", dest="INPUT_FILE")
+    parser.add_argument("-o", "--output", help="Path for include-from file",
+                        type=str, default="backup.rsync", dest="OUTPUT_FILE")
+    parser.add_argument("-k", "--keep", help="Retain include-from file",
+                        action="store_false", dest="DELETE_OUTPUT")
+    parser.add_argument("-q", "--quiet", help="Show less console output",
+                        action="store_false", dest="LOG")
+    parser.add_argument("--version", action="version", version="%(prog)s b5.0")
+    args = parser.parse_args()
+
+    # Process input file
+    print("Processing input file...")
+    paths = process_file(args.INPUT_FILE)
+
+    # Get directories (sub and parent) to include in backup
+    print("Finding all paths to include...")
+    included_paths = []
+    for inc_path in paths[0]:
+        included_paths.extend(get_subdirs(inc_path))
+        included_paths.extend(get_parentdirs(inc_path))
+
+    # Get subdirectories to exclude in backup
+    print("Finding all paths to exclude...")
+    excluded_paths = []
+    for exc_path in paths[1]:
+        excluded_paths.extend(get_subdirs(exc_path))
+
+    # Remove excluded subdirectories
+    print("Generating list of paths to backup...")
+    paths_final = [path for path in included_paths if path not in excluded_paths]
+
+    # Remove paths containing directories in the "partial exclude" list
+    for exc_path in paths[2]:
+        paths_final = [path for path in paths_final if exc_path not in path]
+
+    # Remove any duplicate directories, sort and print results to output file
+    print("Writing path list to", args.OUTPUT_FILE)
+    with open(args.OUTPUT_FILE, "w") as output:
+        for path in sorted(set(paths_final)):
+            logger("+ " + path + "\n", output, args.LOG)
+        logger("- *\n", output, args.LOG)
+
+    # Set backup path
+    if args.path.endswith("/"): backup_path = args.path
+    else:
+        backup_path = args.path + "/" + time.strftime("%d.%m.%Y") + "/"
+        # Test if backup_path already exists...
+        test_path = backup_path
+        loop_index = 0
+        while os.path.isdir(test_path):
+            # ...if so, backup to a subfolder /loop_index/ which does not exist
+            test_path = backup_path + str(loop_index) + "/"
+            loop_index += 1
+        backup_path = test_path
+
+    # Form arguments for rsync
+    rsync_call = ["rsync -", args.RSYNC_ARGS," --include-from=",
+                  args.OUTPUT_FILE, " / ", backup_path]
+    if args.LOG:
+        rsync_call[2:2] = "v"
+        rsync_call.append(" --progress")
+    if args.BACKUP:
+        rsync_call[2:2] = "n"
+    rsync_call = "".join(rsync_call)
+
+    # Run rsync and delete temporary file if DELETE_OUTPUT is True
+    print(rsync_call)
+    subprocess.run(rsync_call, shell=True)
+    if args.DELETE_OUTPUT: os.remove(args.OUTPUT_FILE)
 
 # Functions --------------------------------------------------------------------
 
@@ -109,64 +172,7 @@ def process_file(file):
                 exclude.append(convert_path(line[1:]))
     return(include, exclude, partial_exclude)
 
-# Main -------------------------------------------------------------------------
+# Run program if main ----------------------------------------------------------
 
-# Process input file
-print("Processing input file...")
-paths = process_file(args.INPUT_FILE)
-
-# Get directories (sub and parent) to include in backup
-print("Finding all paths to include...")
-included_paths = []
-for inc_path in paths[0]:
-    included_paths.extend(get_subdirs(inc_path))
-    included_paths.extend(get_parentdirs(inc_path))
-
-# Get subdirectories to exclude in backup
-print("Finding all paths to exclude...")
-excluded_paths = []
-for exc_path in paths[1]:
-    excluded_paths.extend(get_subdirs(exc_path))
-
-# Remove excluded subdirectories
-print("Generating list of paths to backup...")
-paths_final = [path for path in included_paths if path not in excluded_paths]
-
-# Remove paths containing directories in the "partial exclude" list
-for exc_path in paths[2]:
-    paths_final = [path for path in paths_final if exc_path not in path]
-
-# Remove any duplicate directories, sort and print results to file
-print("Writing path list to", args.OUTPUT_FILE)
-with open(args.OUTPUT_FILE, "w") as output:
-    for path in sorted(set(paths_final)):
-        logger("+ " + path + "\n", output, args.LOG)
-    logger("- *\n", output, args.LOG)
-
-# Set path for backup
-if args.path.endswith("/"): backup_path = args.path
-else:
-    backup_path = args.path + "/" + time.strftime("%d.%m.%Y") + "/"
-    # Test if backup_path already exists
-    test_path = backup_path
-    loop_index = 0
-    while os.path.isdir(test_path):
-        # If it exists, backup to a subfolder /loop_index/ which does not exist
-        test_path = backup_path + str(loop_index) + "/"
-        loop_index += 1
-    backup_path = test_path
-
-# Form arguments for rsync
-rsync_call = ["rsync -", args.RSYNC_ARGS," --include-from=", args.OUTPUT_FILE,
-              " / ", backup_path]
-if args.LOG:
-    rsync_call[2:2] = "v"
-    rsync_call.append(" --progress")
-if args.BACKUP:
-    rsync_call[2:2] = "n"
-rsync_call = "".join(rsync_call)
-
-# Run rsync and delete temporary file if DELETE_OUTPUT is True
-print(rsync_call)
-subprocess.run(rsync_call, shell=True)
-if args.DELETE_OUTPUT: os.remove(args.OUTPUT_FILE)
+if __name__ == "__main__":
+    main(sys.argv)
