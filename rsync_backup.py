@@ -145,7 +145,16 @@ with open(args.OUTPUT_FILE, "w") as output:
 
 # Set path for backup
 if args.path.endswith("/"): backup_path = args.path
-else: backup_path = args.path + "/" + time.strftime("%d.%m.%Y") + "/"
+else:
+    backup_path = args.path + "/" + time.strftime("%d.%m.%Y") + "/"
+    # Test if backup_path already exists
+    test_path = backup_path
+    loop_index = 0
+    while os.path.isdir(test_path):
+        # If it exists, backup to a subfolder /loop_index/ which does not exist
+        test_path = backup_path + str(loop_index) + "/"
+        loop_index += 1
+    backup_path = test_path
 
 # Form arguments for rsync
 rsync_call = ["rsync -", args.rsync_args," --include-from=", args.OUTPUT_FILE,
