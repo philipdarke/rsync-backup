@@ -21,9 +21,9 @@ def main(argv):
                                      description="Backup selected files/folders using rsync")
     parser.add_argument("path", help="Path for backup")
     parser.add_argument("-b", "--backup", help="Make backup (else does a dry run)",
-                        action="store_false", dest="BACKUP")
+                        action="store_false", dest="DRYRUN")
     parser.add_argument("-a", "--args", help="Arguments for rsync (default ar)",
-                        type=str, default="ar", dest="RSYNC_ARGS")
+                        type=str, default="ar", dest="rsync_args")
     parser.add_argument("-i", "--input", help="Path to input.rsync file",
                         type=str, default="input.rsync", dest="INPUT_FILE")
     parser.add_argument("-o", "--output", help="Path for include-from file",
@@ -81,14 +81,10 @@ def main(argv):
         backup_path = test_path
 
     # Form arguments for rsync
-    rsync_call = ["rsync -", args.RSYNC_ARGS," --include-from=",
-                  args.OUTPUT_FILE, " / ", backup_path]
-    if args.LOG:
-        rsync_call[2:2] = "v"
-        rsync_call.append(" --progress")
-    if args.BACKUP:
-        rsync_call[2:2] = "n"
-    rsync_call = "".join(rsync_call)
+    if args.DRYRUN: args.rsync_args += "n"
+    rsync_call = "rsync -" + args.rsync_args + " --include-from=" \
+                 + args.OUTPUT_FILE + " / " + backup_path
+    if args.LOG: rsync_call = rsync_call + " --progress --verbose"
 
     # Run rsync and delete temporary file if DELETE_OUTPUT is True
     print(rsync_call)
