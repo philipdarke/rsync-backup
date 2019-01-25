@@ -91,7 +91,7 @@ def main(argv):
     # Set backup path
     if args.path.endswith("/"): backup_path = args.path
     else:
-        backup_path = args.path + "/" + time.strftime("%d.%m.%Y") + "/"
+        backup_path = args.path + "/" + time.strftime("%d.%m.%Y-%H.%M.%S") + "/"
         # Test if backup_path already exists...
         test_path = backup_path
         loop_index = 0
