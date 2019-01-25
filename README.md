@@ -29,6 +29,19 @@ If the path does not end in a forward-slash (e.g. `/mnt/c/backups`) the backup w
 
 Note that if `/mnt/c/backups/dd.mm.yyyy-hh.mm.ss/` already exists, then the backup will be made to a numbered subdirectory that does not already exist e.g. `/mnt/c/backups/dd.mm.yyyy-hh.mm.ss/0/`.
 
+#### Mounting external drives
+
+By default, WSL mounts all fixed drives when launching Bash.  External storage (e.g. removeable drives or USB sticks) and network locations can be mounted manually by making a directory under `/mnt/` and mapping the Windows drive to the folder.  
+
+For example, the following commands mount an external drive with the Windows letter `E:` under `/mnt/e/`
+
+```
+$ sudo mkdir /mnt/e
+$ sudo mount -t drvfs E: /mnt/e
+```
+
+See more details [here](https://blogs.msdn.microsoft.com/wsl/2017/04/18/file-system-improvements-to-the-windows-subsystem-for-linux/).
+
 ### `PARAMETERS`
 
 Parameter          | Description
