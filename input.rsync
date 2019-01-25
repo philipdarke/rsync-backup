@@ -2,16 +2,16 @@
 # ---------------------------
 #
 # 1) Individual files/directories to include in backup should start with "+"
-#    e.g. "+/home/".  All subdirectories will also be included.
+#    e.g. "+ /home/".  All subdirectories will also be included.
 #
 # 2) Individual directories to exclude from backup should start with "-"
-#    e.g. "-/home/gems/".  All subdirectories will also be excluded. It is
+#    e.g. "- /home/gems/".  All subdirectories will also be excluded. It is
 #    not possible to exclude a specific file, only a directory and its
 #    subdirectories.
 #
 # 3) If you want to exclude multiple directories with the same name, start the
-#    directory name with ":" with no closing back/forward slash. For example,
-#    adding the line ":.venv" will result in all paths including "/.venv/"
+#    directory name with "*" with no closing back/forward slash. For example,
+#    adding the line "* .venv" will result in all paths including "/.venv/"
 #    (plus their subdirectories) being excluded.
 #
 # 4) Paths can be Windows (starting with the drive letter) or Linux (starting
@@ -21,11 +21,11 @@
 #
 # 6) Blank lines and lines starting with "#" are ignored.
 
-+C:\Users\
-+/home/
++ C:\Users\
++ /home/
 
--C:\temp\
--/home/gems/
+- C:\temp\
+- /home/gems/
 
-:.venv
-:.cache
+* .venv
+* .cache

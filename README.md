@@ -47,11 +47,11 @@ Parameter          | Description
 
 A [template `input.rsync` file](https://github.com/philipdarke/rsync-backup/blob/master/input.rsync) is provided.  See the [tutorial](https://github.com/philipdarke/rsync-backup/blob/master/TUTORIAL.md) for usage examples.
 
-1. Individual files/directories to include in the backup should start with `+` e.g. `+/home/`.  All subdirectories will also be included.
+1. Individual files/directories to include in the backup should start with `+` e.g. `+ /home/`.  All subdirectories will also be included.
 
-2. Individual directories to exclude from backup should start with `-` e.g. `-/home/gems/`.  All subdirectories will also be excluded. It is not possible to exclude a specific file, only a directory and its subdirectories.
+2. Individual directories to exclude from backup should start with `-` e.g. `- /home/gems/`.  All subdirectories will also be excluded. It is not possible to exclude a specific file, only a directory and its subdirectories.
 
-3. If you want to exclude multiple directories with the same name, start the directory name with `:` with no closing back/forward slash. For example, adding the line `:.venv` will result in all paths including `/.venv/` (plus their subdirectories) being excluded.
+3. If you want to exclude multiple directories with the same name, start the directory name with `*` with no closing back/forward slash. For example, adding the line `* .venv` will result in all paths including `/.venv/` (plus their subdirectories) being excluded.
 
 4. Paths can be Windows format (starting with the drive letter) or Linux format (starting with a forward-slash).
 

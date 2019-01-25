@@ -175,18 +175,18 @@ def process_file(file):
             if len(line) == 0 or line.startswith("#"): continue
             # Remove trailing whitespaces
             line = line.rstrip()
-            # Add directory to partial_exclude list if line starts with ":"
-            if line.startswith(":"):
-                temp_exclude = line[1:].replace("\\", "/")
+            # Add directory to partial_exclude list if line starts with "* "
+            if line.startswith("* "):
+                temp_exclude = line[2:].replace("\\", "/")
                 if not temp_exclude.startswith("/"): temp_exclude = "/" + temp_exclude
                 if not temp_exclude.endswith("/"): temp_exclude += "/"
                 partial_exclude.append(temp_exclude)
             # Add directory to include list if line starts with "+"
-            elif line.startswith("+"):
-                include.append(convert_path(line[1:]))
+            elif line.startswith("+ "):
+                include.append(convert_path(line[2:]))
             # Add directory to exclude list if line starts with "-"
-            elif line.startswith("-"):
-                exclude.append(convert_path(line[1:]))
+            elif line.startswith("- "):
+                exclude.append(convert_path(line[2:]))
     return(include, exclude, partial_exclude)
 
 # Run program if main ----------------------------------------------------------
