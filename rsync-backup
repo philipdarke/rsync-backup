@@ -58,6 +58,9 @@ def main(argv):
                         action="store_false", dest="LOG")
     args = parser.parse_args()
 
+    # Convert backup path to Linux format
+    args.path = convert_path(args.path)
+
     # Process input file
     print("Processing input file...")
     paths = process_file(args.INPUT_FILE)
@@ -113,6 +116,8 @@ def main(argv):
     print(rsync_call)
     subprocess.run(rsync_call, shell=True)
     if args.DELETE_OUTPUT: os.remove(args.OUTPUT_FILE)
+
+# ------------------------------------------------------------------------------
 
 # logger()
 # Prints raw string to file and also to console if log is True
