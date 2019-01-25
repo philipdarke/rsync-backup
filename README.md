@@ -15,13 +15,13 @@ Unfortunately these filter rules quickly get complicated if you wish to selectiv
 
 1. Clone or download to a Windows folder or a WSL directory.
 2. Add the paths for the files and directories you wish to backup in `input.rsync`.
-3. Run `./rsync_backup PATH -b PARAMETERS` from the WSL to carry out the backup.  `PATH` is the location you wish to backup to (if using a Windows path it must be passed as a string e.g. `"C:\Backups\"`).
+3. Run `./rsync_backup PATH -b PARAMETERS` from the WSL to carry out the backup.  `PATH` is the location you wish to backup to (if using a Windows path it must be passed as a string or by escaping the back-slashes e.g. `"C:\Backups\"` or `C:\\Backups\\`).
 
 **See further details below and the [tutorial](https://github.com/philipdarke/rsync-backup/blob/master/TUTORIAL.md) for usage examples.**
 
 ### `PATH`
 
-`PATH` is the location where the backup will be made.  If it is a Windows path is must be passed as a string i.e. `/mnt/c/backups/` or `"C:\Backups\"` will both backup to `C:\Backups\`.
+`PATH` is the location where the backup will be made.  If it is a Windows path is must be passed as a string or by escaping the back-slashes.  For example `/mnt/c/backups/`, `"C:\Backups\"` and `C:\\Backups\\` will all backup to `C:\Backups\`.
 
 If the path ends in a forward-slash (e.g. `/mnt/c/backups/`) the backup will be made to this location.  This allows sequential backups to be made to the same location using the incremental file transfer features of `rsync`.
 
