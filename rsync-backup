@@ -53,13 +53,16 @@ def main(argv):
     parser.add_argument("-o", "--output", help="path for include-from file",
                         type=str, default="backup.rsync", dest="OUTPUT_FILE")
     parser.add_argument("-k", "--keep", help="retain include-from file after backup",
-                        action="store_false", dest="DELETE_OUTPUT")
+                        action="store_false", dest="delete_output")
     parser.add_argument("-q", "--quiet", help="quiet mode i.e. do not show rsync progress",
                         action="store_false", dest="LOG")
     args = parser.parse_args()
 
     # Convert backup path to Linux format
     args.path = convert_path(args.path)
+
+    # Keep include-from file if a custom path is specified
+    if args.OUTPUT_FILE != "backup.rsync": args.delete_output = False
 
     # Process input file
     print("Processing input file...")
@@ -112,10 +115,10 @@ def main(argv):
                  + args.OUTPUT_FILE + " / " + backup_path
     if args.LOG: rsync_call = rsync_call + " --progress --verbose"
 
-    # Run rsync and delete temporary file if DELETE_OUTPUT is True
+    # Run rsync and delete temporary file if delete_output is True
     print(rsync_call)
     subprocess.run(rsync_call, shell=True)
-    if args.DELETE_OUTPUT: os.remove(args.OUTPUT_FILE)
+    if args.delete_output: os.remove(args.OUTPUT_FILE)
 
 # ------------------------------------------------------------------------------
 
