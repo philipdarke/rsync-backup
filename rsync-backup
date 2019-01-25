@@ -34,10 +34,12 @@ import argparse
 import subprocess
 import time
 
-# Main -------------------------------------------------------------------------
+# Functions --------------------------------------------------------------------
 
+# main()
+# Parses arguments and input file, generates a file with filter rules for rsync
+# and calls rsync to make backup
 def main(argv):
-
     # Parse arguments
     parser = argparse.ArgumentParser(prog="rsync_backup",
                                      description="Backup selected files/folders using rsync")
@@ -111,8 +113,6 @@ def main(argv):
     print(rsync_call)
     subprocess.run(rsync_call, shell=True)
     if args.DELETE_OUTPUT: os.remove(args.OUTPUT_FILE)
-
-# Functions --------------------------------------------------------------------
 
 # logger()
 # Prints raw string to file and also to console if log is True
