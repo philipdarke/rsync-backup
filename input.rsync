@@ -9,10 +9,9 @@
 #    not possible to exclude a specific file, only a directory and its
 #    subdirectories.
 #
-# 3) If you want to exclude multiple directories with the same name, start the
-#    directory name with "*" with no closing back/forward slash. For example,
-#    adding the line "* .venv" will result in all paths including "/.venv/"
-#    (plus their subdirectories) being excluded.
+# 3) If you want to exclude every instance of a named directory, start with 
+#    `*` with no closing back/forward slash. For example, adding the line 
+#    `* .venv` will exclude from the backup any paths that include `/.venv/`.
 #
 # 4) Paths can be Windows (starting with the drive letter) or Linux (starting
 #    with a forward-slash).
