@@ -1,5 +1,5 @@
 # rsync-backup
-Quickly backup your Windows machine using `rsync` and the Windows Subsystem for Linux
+Backup your Windows machine using `rsync` and the Windows Subsystem for Linux
 
 ## Summary
 
@@ -25,9 +25,7 @@ Unfortunately these filter rules quickly get complicated if you wish to selectiv
 
 If the path ends in a forward/back-slash (e.g. `/mnt/c/backups/`) the backup will be made to this location.  This allows sequential backups to be made to the same location using the incremental file transfer features of `rsync`.
 
-If the path does not end in a forward/back-slash (e.g. `/mnt/c/backups`) the backup will be made to a subdirectory with the current date and time i.e. `/mnt/c/backups/dd.mm.yyyy-hh.mm.ss/`.
-
-Note that if `/mnt/c/backups/dd.mm.yyyy-hh.mm.ss/` already exists, then the backup will be made to a numbered subdirectory that does not already exist e.g. `/mnt/c/backups/dd.mm.yyyy-hh.mm.ss/0/`.
+If the path does not end in a forward/back-slash (e.g. `/mnt/c/backups`) the backup will be made to a subdirectory with the current date and time i.e. `/mnt/c/backups/dd.mm.yyyy-hh.mm.ss/` (or a numbered subdirectory if this already exists).
 
 #### Mounting external drives
 
@@ -49,7 +47,7 @@ Parameter          | Description
 `-b` or `--backup` | Perform backup.  If `-b` is not specified, a dry run is performed but no files are copied.
 `-a` or `--args`   | Set custom arguments[*](#note1) for `rsync` (default `aR`).
 `-i` or `--input`  | Path for the input file (default `input.rsync`).
-`-o` or `--output` | Path for the `include-from` file containing the filter rules for `rsync` (default `backup.rsync`).
+`-o` or `--output` | Where to save the `include-from` file containing the `rsync` filter rules (default `backup.rsync`).
 `-k` or `--keep`   | Do not delete the `include-from` file after the backup is made.
 `-q` or `--quiet`  | Quiet mode i.e. do not show `rsync` progress during a backup.
 `-h` or `--help`   | Display help message and exit.
@@ -64,7 +62,7 @@ A [template `input.rsync` file](https://github.com/philipdarke/rsync-backup/blob
 
 2. Individual directories to exclude from backup should start with `-` e.g. `- /home/gems/`.  All subdirectories will also be excluded. It is not possible to exclude a specific file, only a directory and its subdirectories.
 
-3. If you want to exclude multiple directories with the same name, start the directory name with `*` with no closing back/forward slash. For example, adding the line `* .venv` will result in all paths including `/.venv/` (plus their subdirectories) being excluded.
+3. If you want to exclude every instance of a named directory, start with `*` with no closing back/forward slash. For example, adding the line `* .venv` will exclude from the backup any paths that include `/.venv/`.
 
 4. Paths can be Windows format (starting with the drive letter) or Linux format (starting with a forward-slash).
 
