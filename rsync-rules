@@ -174,6 +174,7 @@ def pattern_rules(input, output, verbose):
         for path in sorted(set(paths_final)):
             logger('+ ' + path + '\n', outfile, verbose)
         logger('- *\n', outfile, verbose)
+    print('[', datetime.now().strftime(FORMAT), ']: ', 'Done!', sep='')
 
 
 # Main -------------------------------------------------------------------------
@@ -181,21 +182,21 @@ def pattern_rules(input, output, verbose):
 if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='rsync-rules',
-                                     description='Generate filter rules for rsync')
-    parser.add_argument('-i', '--input',
-                        help='path to input.rsync file',
-                        type=str,
-                        default='input.rsync',
-                        dest='INPUT')
-    parser.add_argument('-o', '--output',
-                        help='path for include-from file',
-                        type=str,
-                        default='backup.rsync',
-                        dest='OUTPUT')
+                                     description='Generate filter rules for rsync.')
     parser.add_argument('-v', '--verbose',
                         help='print pattern rules to console',
                         action='store_true',
                         dest='VERBOSE')
+    parser.add_argument('-i', '--input',
+                        help='path to rules file (default "./input.rsync")',
+                        type=str,
+                        default='input.rsync',
+                        dest='INPUT')
+    parser.add_argument('-o', '--output',
+                        help='path for output file (default "./pattern_rules.rsync")',
+                        type=str,
+                        default='pattern_rules.rsync',
+                        dest='OUTPUT')
     args = parser.parse_args()
 
     # Generate output
