@@ -181,7 +181,7 @@ def pattern_rules(input, output, verbose):
 
 if __name__ == '__main__':
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='rsync-rules',
+    parser = argparse.ArgumentParser(prog='rsync_rules',
                                      description='Generate filter rules for rsync.')
     parser.add_argument('-v', '--verbose',
                         help='print pattern rules to console',
