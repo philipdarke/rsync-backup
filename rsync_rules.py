@@ -32,7 +32,7 @@ import argparse
 from datetime import datetime
 
 # Constants
-FORMAT = '%Y-%m-%d %X'
+FORMAT = '%Y.%m.%d %H.%M.%S'
 
 
 def logger(raw_text, output, log):
@@ -188,9 +188,9 @@ if __name__ == '__main__':
                         action='store_true',
                         dest='VERBOSE')
     parser.add_argument('-i', '--input',
-                        help='path to rules file (default "./input.rsync")',
+                        help='path to rules file (default "./rules.rsync")',
                         type=str,
-                        default='input.rsync',
+                        default='rules.rsync',
                         dest='INPUT')
     parser.add_argument('-o', '--output',
                         help='path for output file (default "./pattern_rules.rsync")',
