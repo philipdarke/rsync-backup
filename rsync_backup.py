@@ -96,5 +96,8 @@ if __name__ == '__main__':
         rsync_call += ' --dry-run'
 
     # Run rsync backup
-    print('Running "', rsync_call, '"', sep='')
+    print('[', datetime.now().strftime(FORMAT), ']: ',
+          'Running "', rsync_call, '"', sep='')
     subprocess.run(rsync_call, shell=True)
+    print('[', datetime.now().strftime(FORMAT), ']: ',
+          'Done!', sep='')
