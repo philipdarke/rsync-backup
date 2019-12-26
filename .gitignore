@@ -1,6 +1,3 @@
-# .rsync files
-*.rsync
-
 # PyCharm
 .idea
 
