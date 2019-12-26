@@ -91,13 +91,14 @@ if __name__ == '__main__':
     rsync_call = 'rsync -' + args.rsync_args + ' --include-from="' \
                  + args.OUTPUT + '" / ' + backup_path
     if args.LOG:
-        rsync_call += ' --log-file="rsync.log"'
+        rsync_call += ' --log-file="rsync' + \
+                      datetime.now().strftime(FORMAT) + '.log"'
     if args.DRYRUN:
         rsync_call += ' --dry-run'
 
     # Run rsync backup
-    print('[', datetime.now().strftime(FORMAT), ']: ',
-          'Running "', rsync_call, '"', sep='')
+    print('[', datetime.now().strftime(rsync_rules.FORMAT), ']: ',
+          'Running "', rsync_call, '"...', sep='')
     subprocess.run(rsync_call, shell=True)
-    print('[', datetime.now().strftime(FORMAT), ']: ',
+    print('[', datetime.now().strftime(rsync_rules.FORMAT), ']: ',
           'Done!', sep='')

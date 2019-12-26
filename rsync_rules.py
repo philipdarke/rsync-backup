@@ -174,8 +174,6 @@ def pattern_rules(input, output, verbose):
         for path in sorted(set(paths_final)):
             logger('+ ' + path + '\n', outfile, verbose)
         logger('- *\n', outfile, verbose)
-    print('[', datetime.now().strftime(FORMAT), ']: ',
-          'Pattern rules file ready', sep='')
 
 
 # Main -------------------------------------------------------------------------
