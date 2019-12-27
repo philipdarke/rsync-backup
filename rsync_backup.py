@@ -64,10 +64,11 @@ if __name__ == '__main__':
                         type=str,
                         default="aPmv",
                         dest="rsync_args")
-    parser.add_argument("-l", "--no-log",
-                        help="do not log rsync progress",
-                        action="store_false",
-                        dest="LOG")
+    parser.add_argument("-l", "--log-file",
+                        help="path for rsync log file",
+                        type=str,
+                        default=None,
+                        dest="log_file")
     args = parser.parse_args()
 
     # Generate pattern rule file for rsync
@@ -90,9 +91,8 @@ if __name__ == '__main__':
     # Generate arguments for rsync
     rsync_call = 'rsync -' + args.rsync_args + ' --include-from="' \
                  + args.OUTPUT + '" / ' + backup_path
-    if args.LOG:
-        rsync_call += ' --log-file="rsync' + \
-                      datetime.now().strftime(FORMAT) + '.log"'
+    if args.log_file is not None:
+        rsync_call += ' --log-file="' + args.log_file + '"'
     if args.DRYRUN:
         rsync_call += ' --dry-run'
 
