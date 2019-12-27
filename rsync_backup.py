@@ -65,6 +65,10 @@ if __name__ == '__main__':
                         type=str,
                         default=None,
                         dest="log_file")
+    parser.add_argument("-k", "--keep",
+                        help="keep output pattern rules file",
+                        action="store_false",
+                        dest="DELETE_OUTPUT")
     args = parser.parse_args()
 
     # Generate pattern rule file for rsync
@@ -96,5 +100,9 @@ if __name__ == '__main__':
     print('[', datetime.now().strftime(rsync_rules.FORMAT), ']: ',
           "Running '", rsync_call, "'...", sep='')
     subprocess.run(rsync_call, shell=True)
+
+    # Remove pattern rules file
+    if args.DELETE_OUTPUT:
+        os.remove(args.OUTPUT)
     print('[', datetime.now().strftime(rsync_rules.FORMAT), ']: ',
           'Done!', sep='')
