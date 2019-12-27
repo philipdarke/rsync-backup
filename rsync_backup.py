@@ -41,10 +41,6 @@ if __name__ == '__main__':
                                      description='Backup selected files/folders using rsync.')
     parser.add_argument("path",
                         help="path for backup")
-    parser.add_argument('-v', '--verbose',
-                        help='print pattern rules to console',
-                        action='store_true',
-                        dest='VERBOSE')
     parser.add_argument('-i', '--input',
                         help='path to rules file (default "./rules.rsync")',
                         type=str,
@@ -72,7 +68,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Generate pattern rule file for rsync
-    rsync_rules.pattern_rules(args.INPUT, args.OUTPUT, args.VERBOSE)
+    rsync_rules.pattern_rules(args.INPUT, args.OUTPUT, False)
 
     # Get backup path (see documentation)
     if args.path.endswith("/"):
