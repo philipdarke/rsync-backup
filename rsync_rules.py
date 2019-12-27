@@ -187,9 +187,9 @@ if __name__ == '__main__':
                         action='store_true',
                         dest='VERBOSE')
     parser.add_argument('-i', '--input',
-                        help='path to rules file (default "./rules.rsync")',
+                        help='path to rules file (default "./input_rules.rsync")',
                         type=str,
-                        default='rules.rsync',
+                        default='input_rules.rsync',
                         dest='INPUT')
     parser.add_argument('-o', '--output',
                         help='path for output file (default "./pattern_rules.rsync")',

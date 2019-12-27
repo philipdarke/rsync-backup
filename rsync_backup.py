@@ -42,9 +42,9 @@ if __name__ == '__main__':
     parser.add_argument("path",
                         help="path for backup")
     parser.add_argument('-i', '--input',
-                        help='path to rules file (default "./rules.rsync")',
+                        help='path to rules file (default "./input_rules.rsync")',
                         type=str,
-                        default='rules.rsync',
+                        default='input_rules.rsync',
                         dest='INPUT')
     parser.add_argument('-o', '--output',
                         help='path for output file (default "./pattern_rules.rsync")',
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     # Run rsync backup
     print('[', datetime.now().strftime(rsync_rules.FORMAT), ']: ',
-          'Running "', rsync_call, '"...', sep='')
+          "Running '", rsync_call, "'...", sep='')
     subprocess.run(rsync_call, shell=True)
     print('[', datetime.now().strftime(rsync_rules.FORMAT), ']: ',
           'Done!', sep='')
