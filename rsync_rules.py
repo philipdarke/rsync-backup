@@ -32,7 +32,7 @@ import argparse
 from datetime import datetime
 
 # Date/time format for output
-FORMAT = '%Y.%m.%d %H.%M.%S'
+FORMAT = '%H.%M.%S'
 
 
 def logger(raw_text, output, log):
