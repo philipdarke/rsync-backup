@@ -72,7 +72,7 @@ Consider the contents of a simplified `C:` drive:
  - Windows
 ```
 
-You wish to backup `Program Files` and `Users`, but not `Users\USER_NAME\Downloads` or `Windows`. In addition, you wish to back up the Windows Subsystem for Linux home directory.
+You wish to backup `Program Files` and `Users`, but not `Users\USER_NAME\Downloads`. In addition, you wish to back up the Windows Subsystem for Linux home directory.
 
 `input_rules.rsync` should therefore contain the following:
 
