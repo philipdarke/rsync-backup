@@ -25,15 +25,16 @@ The tools can be used under the [Windows Subsystem for Linux](https://docs.micro
 
 ### <a name="input">Input file</a>
 
-A [template `input_rules.rsync` file](https://github.com/philipdarke/rsync-backup/blob/master/input.rsync) is provided.  See the [tutorial](https://github.com/philipdarke/rsync-backup/blob/master/TUTORIAL.md) for usage examples.
+A [template `input_rules.rsync` file](https://github.com/philipdarke/rsync-backup/blob/master/input_rules.rsync) is provided.  See the [tutorial](https://github.com/philipdarke/rsync-backup/blob/master/TUTORIAL.md) for usage examples.
 
-1. Individual files or directories to include in the backup should start with `+` e.g. `+ ~/notes.md` or `+ ~/`.  When a directory is included, all subdirectories will also be included.
-1. Individual directories to exclude from the backup should start with `-` e.g. `- ~/gems/`.  All subdirectories will also be excluded. It is not possible to exclude a specific file, only a directory and its subdirectories.
-1. If you want to exclude every instance of a named directory, start with `*` with no closing back/forward slash. For example, adding the line `* .venv` will exclude from the backup **all** paths that include `/.venv/`.
+1. Individual files or directories to include in the backup should start with "+" e.g. `+ ~/notes.md` or `+ ~/`.  When a directory is included, all subdirectories will also be included.
+1. Individual directories to exclude from the backup should start with "-" e.g. `- ~/gems/`.  All subdirectories will also be excluded. It is not possible to exclude a specific file, only a directory and its subdirectories.
+1. If you want to exclude every instance of a named directory, start with "*" with no closing back/forward slash. For example, adding the line `* .venv` will exclude from the backup **all** paths that include `/.venv/`.
 1. All directories must end in a forward-slash.
 1. Blank lines and lines starting with `#` (e.g. for comments) are ignored.
+1. Windows paths can also be provided if using the Windows Subsystem for Linux (see [below](#wsl)).
 
-### `rsync_rules`
+### rsync_rules
 
 `rsync_rules` generates the pattern rules file only.
 
@@ -46,7 +47,7 @@ Parameter              | Description
 `-v` or `--verbose`    | Print the pattern rules to the console as they are generated.
 `-h` or `--help`       | Display help message and exit.
 
-### `rsync_backup`
+### rsync_backup
 
 `rsync_backup` generates the pattern rules file and passes it to `rsync` to carry out a backup.
 
@@ -54,19 +55,19 @@ The syntax is `./rsync_backup.py PATH [OPTIONAL PARAMETERS]`.  Note that `-b` or
 
 `PATH` is the location where the backup will be made.  See [below](#path) for more information.  The parameters are:
 
-Parameter              | Description
----------------------- | -----------------------------------------------------------
-`-i` or `--input`      | Path for the input file (default `./input_rules.rsync`).
-`-o` or `--output`     | Where to save the `include-from` file containing the `rsync` filter rules (default `./pattern_rules.rsync`).
-**`-b` or `--backup`** | **Perform backup.  If `-b` is not specified, a dry run is performed where no files are copied.**
-`-a` or `--args`       | Set custom arguments[*](#params) for `rsync` (default `aPmv`).
-`-l` or `--log-file`   | Path to save the `rsync` log file.  A log file is not generated unless a path is passed.
-`-k` or `--keep`       | Do not delete the `include-from` file after the backup is made.
-`-h` or `--help`       | Display help message and exit.
+Parameter                  | Description
+-------------------------- | -----------------------------------------------------------
+`-i` or `--input`          | Path for the input file (default `./input_rules.rsync`).
+`-o` or `--output`         | Where to save the `include-from` file containing the `rsync` filter rules (default `./pattern_rules.rsync`).
+**`-b` or `--backup`**     | **Perform backup.  If `-b` is not specified, a dry run is performed where no files are copied.**
+`-a` or `--args`           | Set custom arguments[*](#params) for `rsync` (default `aPmv`).
+`-l` or `--log-file`       | Path to save the `rsync` log file.  A log file is not generated unless a path is passed.
+`-k` or `--keep`           | Do not delete the `include-from` file after the backup is made.
+`-h` or `--help`           | Display help message and exit.
 
 <a name="params">\*<a> See the [`rsync` documentation](https://download.samba.org/pub/rsync/rsync.html) for a full list of parameters.  The default parameters used are `a` (archive mode), `P` (show progress), `m` (do not create empty directories) and `v` (verbose console output).
 
-### <a name="path">`PATH`</a>
+### <a name="path">Path</a>
 
 `PATH` is the location where the backup will be made.
 
@@ -90,7 +91,7 @@ Paths can be provided in Windows format including the drive letter.  For example
 
 Windows paths is must be passed as a string or by escaping the back-slashes.  For example `/mnt/c/backups/`, `"C:\Backups\"` and `C:\\Backups\\` will all backup to `C:\Backups\`.
 
-#### Mounting external drives
+*Mounting external drives*
 
 By default, WSL mounts all fixed drives when launching Bash.  External storage (e.g. removeable drives or USB sticks) and network locations can be mounted manually by creating a directory under `/mnt/` and mapping the Windows drive.
 
