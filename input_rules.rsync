@@ -1,0 +1,32 @@
+# Files/directories to backup
+# ---------------------------
+#
+# 1. Individual files or directories to include in the backup should start with
+#    `+` e.g. `+ ~/notes.md` or `+ ~/`.  When a directory is included, all
+#    subdirectories will also be included.
+#
+# 2. Individual directories to exclude from the backup should start with `-`
+#    e.g. `- ~/gems/`.  All subdirectories will also be excluded. It is not
+#    possible to exclude a specific file, only a directory and its
+#    subdirectories.
+#
+# 3. If you want to exclude every instance of a named directory, start with `*`
+#    with no closing back/forward slash. For example, adding the line `* .venv`
+#    will exclude from the backup **all** paths that include `/.venv/`.
+#
+# 4. All directories must end in a forward-slash.
+#
+# 5. Blank lines and lines starting with `#` (e.g. for comments) are ignored.
+#
+# 6. When using under the Windows Subsystem for Linux, paths can be provided
+#    in Windows format including the drive letter.  For example `+ C:\Users\`
+#    or `- C:\temp\`.  All directories must end in "\".
+
++ C:\Users\
++ ~/
+
+- C:\temp\
+- ~/gems/
+
+* .venv
+* .cache
